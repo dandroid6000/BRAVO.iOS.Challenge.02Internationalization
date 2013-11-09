@@ -3,7 +3,7 @@
 Your task, should you choose to accept it, is to make a calculator app for figuring out hours in the future from the current date and time. The catch, the application should be fully internationalized. The application should be localized into one other language (online tools are fine for this)
 
 <p align="center" >
-  <img src="https://raw.github.com/rexeisen/BRAVO.iOS.Challenge.02Internationalization/assets/screenshot.png" alt="Screenshot" title="Screenshot">
+  <img src="https://raw.github.com/rexeisen/BRAVO.iOS.Challenge.02Internationalization/assets/screenshot.png" srcset="https://raw.github.com/rexeisen/BRAVO.iOS.Challenge.02Internationalization/assets/screenshot_2x.png 2x" alt="Screenshot" title="Screenshot">
 </p>
 
 ## Requirements
