@@ -10,7 +10,7 @@ Your task, should you choose to accept it, is to make a calculator app for figur
 
 The top box (labeled Display Today's Date) should display the current date as of when the `applicationWillBecomeActive` notification fires. This should include the full date and time.
 
-The middle boxes is your delta field. This field is your typical calculator input and will display the current delta in hours. For examples of scenarios on how this changes, reference the calculator app. 
+The middle box is your delta field. This field is your typical calculator input and will display the current delta in hours. For examples of scenarios on how this changes, reference the calculator app. 
 
 The last box on top (Display calculated date) will display the first box plus the the second box. This should be displayed as the full date and time
 
