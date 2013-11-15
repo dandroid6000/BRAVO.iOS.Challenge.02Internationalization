@@ -19,6 +19,8 @@
 		4423D612182EA79D00821879 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4423D5FA182EA79D00821879 /* UIKit.framework */; };
 		4423D61A182EA79D00821879 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4423D618182EA79D00821879 /* InfoPlist.strings */; };
 		4423D61C182EA79D00821879 /* HourCalcTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4423D61B182EA79D00821879 /* HourCalcTests.m */; };
+		84B5DA031832E62A004F14DF /* NRDDateCalcViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B5DA011832E62A004F14DF /* NRDDateCalcViewController.m */; };
+		84B5DA041832E62A004F14DF /* NRDDateCalcViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84B5DA021832E62A004F14DF /* NRDDateCalcViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +50,9 @@
 		4423D617182EA79D00821879 /* HourCalcTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "HourCalcTests-Info.plist"; sourceTree = "<group>"; };
 		4423D619182EA79D00821879 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4423D61B182EA79D00821879 /* HourCalcTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HourCalcTests.m; sourceTree = "<group>"; };
+		84B5DA001832E62A004F14DF /* NRDDateCalcViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NRDDateCalcViewController.h; path = ViewControllers/NRDDateCalcViewController.h; sourceTree = "<group>"; };
+		84B5DA011832E62A004F14DF /* NRDDateCalcViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NRDDateCalcViewController.m; path = ViewControllers/NRDDateCalcViewController.m; sourceTree = "<group>"; };
+		84B5DA021832E62A004F14DF /* NRDDateCalcViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = NRDDateCalcViewController.xib; path = ViewControllers/NRDDateCalcViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +114,7 @@
 			children = (
 				4423D605182EA79D00821879 /* NRDAppDelegate.h */,
 				4423D606182EA79D00821879 /* NRDAppDelegate.m */,
+				84B5D9FF1832E5E0004F14DF /* ViewControllers */,
 				4423D608182EA79D00821879 /* Images.xcassets */,
 				4423D5FD182EA79D00821879 /* Supporting Files */,
 			);
@@ -142,6 +148,16 @@
 				4423D618182EA79D00821879 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		84B5D9FF1832E5E0004F14DF /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				84B5DA001832E62A004F14DF /* NRDDateCalcViewController.h */,
+				84B5DA011832E62A004F14DF /* NRDDateCalcViewController.m */,
+				84B5DA021832E62A004F14DF /* NRDDateCalcViewController.xib */,
+			);
+			name = ViewControllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -220,6 +236,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84B5DA041832E62A004F14DF /* NRDDateCalcViewController.xib in Resources */,
 				4423D601182EA79D00821879 /* InfoPlist.strings in Resources */,
 				4423D609182EA79D00821879 /* Images.xcassets in Resources */,
 			);
@@ -241,6 +258,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4423D603182EA79D00821879 /* main.m in Sources */,
+				84B5DA031832E62A004F14DF /* NRDDateCalcViewController.m in Sources */,
 				4423D607182EA79D00821879 /* NRDAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -442,6 +460,7 @@
 				4423D621182EA79D00821879 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4423D622182EA79D00821879 /* Build configuration list for PBXNativeTarget "HourCalcTests" */ = {
 			isa = XCConfigurationList;
@@ -450,6 +469,7 @@
 				4423D624182EA79D00821879 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
