@@ -207,7 +207,9 @@ static const NSUInteger kButtonEquals = 4;
 
 - (void)localeDidChange:(NSNotification *)aNotification
 {
-    // Re-create formatters
+    // Note: self.locale updates automatically to the current locale
+    
+    // Re-create formatters (Apple recommends re-creating them)
     [self initializeFormattersWithLocale:self.locale];
     
     // Update UI
