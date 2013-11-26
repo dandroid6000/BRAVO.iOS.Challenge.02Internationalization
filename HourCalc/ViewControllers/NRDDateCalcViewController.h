@@ -10,6 +10,4 @@
 
 @interface NRDDateCalcViewController : UIViewController
 
-@property (strong, nonatomic) NSDate *today;
-
 @end

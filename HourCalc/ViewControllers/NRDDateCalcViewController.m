@@ -16,18 +16,23 @@ static const NSUInteger kButtonEquals = 4;
 @interface NRDDateCalcViewController ()
 
 // UI
-@property (weak, nonatomic) IBOutlet UILabel *todayLabel;
+@property (weak, nonatomic) IBOutlet UILabel *nowLabel;
 @property (weak, nonatomic) IBOutlet UILabel *deltaLabel;
 @property (weak, nonatomic) IBOutlet UILabel *calculatedLabel;
 
 // Data
-@property (strong, nonatomic) NSDateComponents *delta;
+@property (strong, nonatomic) NSDate *now;
+@property (strong, nonatomic) NSDateComponents *dateDelta;
 @property (assign, nonatomic) BOOL isAdding;
 
 // Localization
 @property (strong, nonatomic) NSCalendar *calendar;
+@property (strong, nonatomic) NSLocale *locale;
 @property (strong, nonatomic) NSDateFormatter *dateFormatter;
 @property (strong, nonatomic) NSNumberFormatter *numberFormatter;
+
+- (NSString *)dateFormatForLocale:(NSLocale *)locale;
+- (void)initializeFormattersWithLocale:(NSLocale *)locale;
 
 @end
 
@@ -38,10 +43,10 @@ static const NSUInteger kButtonEquals = 4;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.dateFormatter = [NSDateFormatter new];
-        self.delta = [NSDateComponents new];
-        self.numberFormatter = [NSNumberFormatter new];
-        [self.delta setHour:0];
+        self.calendar = [NSCalendar autoupdatingCurrentCalendar];
+        self.locale = [NSLocale autoupdatingCurrentLocale];
+        self.dateDelta = [NSDateComponents new];
+        [self.dateDelta setHour:0];
         self.isAdding = YES;
     }
     return self;
@@ -51,11 +56,7 @@ static const NSUInteger kButtonEquals = 4;
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    
-    self.numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
-    // Hide the sign so we can display it explicitly
-    self.numberFormatter.negativePrefix = @"";
-    self.numberFormatter.positivePrefix = @"";
+    [self initializeFormattersWithLocale:self.locale];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -65,6 +66,10 @@ static const NSUInteger kButtonEquals = 4;
                                              selector:@selector(didBecomeActive:)
                                                  name:UIApplicationDidBecomeActiveNotification
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(localeDidChange:)
+                                                 name:NSCurrentLocaleDidChangeNotification
+                                               object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -73,6 +78,9 @@ static const NSUInteger kButtonEquals = 4;
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                  name:UIApplicationDidBecomeActiveNotification
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:NSCurrentLocaleDidChangeNotification
+                                                  object:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -86,24 +94,16 @@ static const NSUInteger kButtonEquals = 4;
     return UIStatusBarStyleLightContent;
 }
 
-//#pragma mark - Setters
-//
-//- (void)setToday:(NSDate *)today
-//{
-//    _today = today;
-//    self.todayLabel.text = [self.dateFormatter stringFromDate:self.today];
-//    [self calculate];
-//}
-
 #pragma mark - IBActions
 
 - (IBAction)didPressDigit:(id)sender
 {
     if ([sender isKindOfClass:[UIButton class]]) {
         UIButton *button = (UIButton *)sender;
-        long long newHours = (long long)self.delta.hour * 10 + (self.isAdding ? 1 : -1) * button.tag;
+        // Safety check!
+        long long newHours = (long long)self.dateDelta.hour * 10 + (self.isAdding ? 1 : -1) * button.tag;
         if (NSIntegerMin <= newHours && newHours <= NSIntegerMax) {
-            [self.delta setHour:(NSInteger)newHours];
+            [self.dateDelta setHour:(NSInteger)newHours];
             [self updateHoursDisplay];
         }
     }
@@ -115,23 +115,23 @@ static const NSUInteger kButtonEquals = 4;
         UIButton *button = (UIButton *)sender;
         switch (button.tag) {
             case kButtonClear:
-                [self.delta setHour:0];
+                [self.dateDelta setHour:0];
                 [self updateHoursDisplay];
                 [self calculate];
                 break;
                 
             case kButtonPlus:
                 self.isAdding = YES;
-                if (self.delta.hour < 0) {
-                    [self.delta setHour:-self.delta.hour];
+                if (self.dateDelta.hour < 0) {
+                    [self.dateDelta setHour:-self.dateDelta.hour];
                 }
                 [self updateHoursDisplay];
                 break;
                 
             case kButtonMinus:
                 self.isAdding = NO;
-                if (self.delta.hour > 0) {
-                    [self.delta setHour:-self.delta.hour];
+                if (self.dateDelta.hour > 0) {
+                    [self.dateDelta setHour:-self.dateDelta.hour];
                 }
                 [self updateHoursDisplay];
                 break;
@@ -150,47 +150,70 @@ static const NSUInteger kButtonEquals = 4;
 
 - (void)updateHoursDisplay
 {
-    self.deltaLabel.text = [NSString stringWithFormat:@"%@ %@ hours", self.isAdding ? @"＋" : @"－", [self.numberFormatter stringFromNumber:@(self.delta.hour)]];
-//    self.deltaLabel.text = [NSString stringWithFormat:@"%@ hours", [self.numberFormatter stringFromNumber:@(self.delta.hour)]];
+    self.deltaLabel.text = [NSString stringWithFormat:@"%@ %@ hours", self.isAdding ? @"＋" : @"－", [self.numberFormatter stringFromNumber:@(self.dateDelta.hour)]];
 }
 
 - (void)calculate
 {
-    NSDate *calculatedDate = [self.calendar dateByAddingComponents:self.delta
-                                                            toDate:self.today
+    NSDate *calculatedDate = [self.calendar dateByAddingComponents:self.dateDelta
+                                                            toDate:self.now
                                                            options:0];
     self.calculatedLabel.text = [self.dateFormatter stringFromDate:calculatedDate];
 }
 
-- (void)dateFormatForLocale:(NSLocale *)locale
+- (NSString *)dateFormatForLocale:(NSLocale *)locale
 {
-    
+    // NOTE: THIS WOULD NEED TO BE FLESHED OUT MORE ACCURATELY, BUT THE IDEA IS HERE
+    NSString *localeID = [locale objectForKey:NSLocaleIdentifier];
+    if ([localeID rangeOfString:@"_US"].location != NSNotFound      // United States
+        || [localeID rangeOfString:@"_BZ"].location != NSNotFound   // Belize
+        || [localeID rangeOfString:@"_CA"].location != NSNotFound   // Canada (could use either..)
+        || [localeID rangeOfString:@"_FM"].location != NSNotFound   // Federated States of Micronesia
+        || [localeID rangeOfString:@"_PW"].location != NSNotFound   // Palau
+        ) {
+        return @"MM/dd/yyyy @ h:mm:ss a";
+    } else if ([localeID rangeOfString:@"_CN"].location != NSNotFound   // China
+               ) {
+        return @"yyyy/MM/dd @ h:mm:ss a";
+    } else {
+        return @"dd/MM/yyyy @ h:mm:ss a";
+    }
+}
+
+- (void)initializeFormattersWithLocale:(NSLocale *)locale
+{
+    self.numberFormatter = [NSNumberFormatter new];
+    self.numberFormatter.locale = locale;
+    self.numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+    // Hide the sign so we can display it explicitly
+    self.numberFormatter.negativePrefix = @"";
+    self.numberFormatter.positivePrefix = @"";
+
+    self.dateFormatter = [NSDateFormatter new];
+    self.dateFormatter.locale = locale;
+    self.dateFormatter.dateFormat = [self dateFormatForLocale:locale];
 }
 
 #pragma mark - Notification handlers
 
 - (void)didBecomeActive:(NSNotification *)aNotification
 {
-    // Set formatting from the current calendar/locale here in case the user changes it
-    self.calendar = [NSCalendar currentCalendar];
-    NSLog(@"Calendar: %@", self.calendar.calendarIdentifier);
-    
-    NSLog(@"Locale ID: %@", [self.calendar.locale objectForKey:NSLocaleIdentifier]);
-    
-    self.numberFormatter.locale = self.calendar.locale;
-    
-    self.dateFormatter.locale = self.calendar.locale;
-    self.dateFormatter.dateFormat = @"MM/dd/yyyy @ h:mm:ss a";
-    
-    self.today = [NSDate date];
-    self.todayLabel.text = [self.dateFormatter stringFromDate:self.today];
+    // Set date and update UI
+    self.now = [NSDate date];
+    self.nowLabel.text = [self.dateFormatter stringFromDate:self.now];
     [self calculate];
     [self updateHoursDisplay];
 }
 
 - (void)localeDidChange:(NSNotification *)aNotification
 {
+    // Re-create formatters
+    [self initializeFormattersWithLocale:self.locale];
     
+    // Update UI
+    self.nowLabel.text = [self.dateFormatter stringFromDate:self.now];
+    [self calculate];
+    [self updateHoursDisplay];
 }
 
 @end
